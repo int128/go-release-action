@@ -1,0 +1,34 @@
+name: lint
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        required: true
+        type: string
+      golangci-lint-version:
+        required: true
+        type: string
+
+jobs:
+  golangci-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ inputs.go-version }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg
+            ~/.cache/go-build
+          key: go-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-${{ runner.os }}-
+      - uses: golangci/golangci-lint-action@v2
+        with:
+          version: ${{ inputs.golangci-lint-version }}
+          skip-go-installation: true
+          skip-pkg-cache: true
+          skip-build-cache: true
