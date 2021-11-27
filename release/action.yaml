@@ -9,27 +9,33 @@ inputs:
 runs:
   using: composite
   steps:
+    - id: config
+      run: |
+        echo "::set-output name=zip::${{ inputs.binary }}-${GOOS}-${GOARCH}.zip"
+        echo "::set-output name=sha::${{ inputs.binary }}-${GOOS}-${GOARCH}.zip.sha256"
+      shell: bash
+
     # archive
     - if: runner.os != 'Windows'
-      run: zip ${{ inputs.binary }}.zip ${{ inputs.binary }} LICENSE README.md
+      run: zip ${{ steps.config.outputs.zip }} ${{ inputs.binary }} LICENSE README.md
       shell: bash
     - if: runner.os == 'Windows'
-      run: powershell Compress-Archive -Path ${{ inputs.binary }}.exe,LICENSE,README.md -DestinationPath ${{ inputs.binary }}.zip
+      run: powershell Compress-Archive -Path ${{ inputs.binary }}.exe,LICENSE,README.md -DestinationPath ${{ steps.config.outputs.zip }}
       shell: bash
 
     # digest
     - if: runner.os != 'macOS'
-      run: sha256sum -b ${{ inputs.binary }}.zip > ${{ inputs.binary }}.zip.sha256
+      run: sha256sum -b ${{ steps.config.outputs.zip }} > ${{ steps.config.outputs.sha }}
       shell: bash
     - if: runner.os == 'macOS'
-      run: shasum -a 256 -b ${{ inputs.binary }}.zip > ${{ inputs.binary }}.zip.sha256
+      run: shasum -a 256 -b ${{ steps.config.outputs.zip }} > ${{ steps.config.outputs.sha }}
       shell: bash
-    - run: cat ${{ inputs.binary }}.zip.sha256
+    - run: cat ${{ steps.config.outputs.sha }}
       shell: bash
 
     # upload
     - if: startsWith(github.ref, 'refs/tags/')
-      run: gh release upload "${GITHUB_REF/refs\/tags\//}" ${{ inputs.binary }}.zip ${{ inputs.binary }}.zip.sha256
+      run: gh release upload "${GITHUB_REF/refs\/tags\//}" ${{ steps.config.outputs.zip }} ${{ steps.config.outputs.sha }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
