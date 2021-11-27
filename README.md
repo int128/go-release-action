@@ -1,2 +1,3 @@
-# go-workflows
-Reusable workflows for Go
+# go-actions
+
+This repository provides general-purpose actions for Go.
