@@ -21,7 +21,7 @@ runs:
     - if: runner.os != 'Windows'
       run: zip ${{ inputs.archive }} ${{ inputs.binary }} LICENSE README.md
     - if: runner.os == 'Windows'
-      run: powershell Compress-Archive -Path ${{ inputs.binary }},LICENSE,README.md -DestinationPath ${{ inputs.archive }}
+      run: powershell Compress-Archive -Path ${{ inputs.binary }}.exe,LICENSE,README.md -DestinationPath ${{ inputs.archive }}
 
     # digest
     - if: runner.os != 'macOS'
