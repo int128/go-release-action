@@ -1,0 +1,77 @@
+name: release
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        required: false
+        type: string
+        default: ubuntu-latest
+      dry-run:
+        required: false
+        type: boolean
+        default: true
+      go-version:
+        required: true
+        type: string
+      go-build-flags:
+        required: false
+        type: string
+      go-build-ldflags:
+        required: false
+        type: string
+        default: -X main.version=${GITHUB_REF##*/}
+      product:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      arch:
+        required: true
+        type: string
+      cgo-enabled:
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: ${{ inputs.runs-on }}
+    env:
+      TARGET: ${{ inputs.product }}-${{ inputs.os }}-${{ inputs.arch }}.zip
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ inputs.go-version }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg
+            ~/.cache/go-build
+          key: go-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-${{ runner.os }}-
+
+      # build
+      - run: go build -o ${{ inputs.product }} -ldflags "${{ inputs.go-build-ldflags }}" ${{ inputs.go-build-flags }} ./...
+        env:
+          GOOS: ${{ inputs.os }}
+          GOARCH: ${{ inputs.arch }}
+          CGO_ENABLED: ${{ inputs.cgo-enabled }}
+
+      # archive
+      - if: runner.os != 'Windows'
+        run: zip $TARGET ${{ inputs.product }} LICENSE README.md
+      - if: runner.os == 'Windows'
+        run: powershell Compress-Archive -Path ${{ inputs.product }},LICENSE,README.md -DestinationPath $TARGET
+
+      # digest
+      - if: runner.os != 'macOS'
+        run: sha256sum -b $TARGET ${TARGET}.sha256
+      - if: runner.os == 'macOS'
+        run: shasum -a 256 -b $TARGET > ${TARGET}.sha256
+
+      # upload
+      - if: inputs.dry-run == false
+        run: gh release upload "${GITHUB_REF##*/}" "$TARGET" "${TARGET}.sha256"
