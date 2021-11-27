@@ -19,9 +19,18 @@ jobs:
       matrix:
         platform:
           - runs-on: ubuntu-latest
+            GOOS: linux
+            GOARCH: amd64
           - runs-on: macos-latest
+            GOOS: darwin
+            GOARCH: amd64
           - runs-on: windows-latest
+            GOOS: windows
+            GOARCH: amd64
     runs-on: ${{ matrix.platform.runs-on }}
+    env:
+      GOOS: ${{ inputs.GOOS }}
+      GOARCH: ${{ inputs.GOARCH }}
     steps:
       - uses: actions/checkout@v2
       - uses: ./setup
