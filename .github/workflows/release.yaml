@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - v1
+    tags:
+      - test/release/*
     paths:
       - release/**
 
