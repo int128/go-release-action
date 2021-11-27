@@ -24,7 +24,7 @@ jobs:
       - uses: ./setup
         with:
           go-version: 1.17
-      - run: go build -o example
+      - run: go build
       - uses: ./release
         with:
-          binary: example
+          binary: go-actions

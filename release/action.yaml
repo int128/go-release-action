@@ -5,10 +5,6 @@ inputs:
   binary:
     description: path to a binary
     required: true
-  archive:
-    description: name of archive
-    required: true
-    default: ${{ inputs.binary }}.zip
   dry-run:
     description: set false to upload an archive
     required: false
@@ -19,16 +15,21 @@ runs:
   steps:
     # archive
     - if: runner.os != 'Windows'
-      run: zip ${{ inputs.archive }} ${{ inputs.binary }} LICENSE README.md
+      run: zip ${{ inputs.binary }}.zip ${{ inputs.binary }} LICENSE README.md
+      shell: bash
     - if: runner.os == 'Windows'
-      run: powershell Compress-Archive -Path ${{ inputs.binary }}.exe,LICENSE,README.md -DestinationPath ${{ inputs.archive }}
+      run: powershell Compress-Archive -Path ${{ inputs.binary }}.exe,LICENSE,README.md -DestinationPath ${{ inputs.binary }}.zip
+      shell: bash
 
     # digest
     - if: runner.os != 'macOS'
-      run: sha256sum -b ${{ inputs.archive }} ${{ inputs.archive }}.sha256
+      run: sha256sum -b ${{ inputs.binary }}.zip > ${{ inputs.binary }}.zip.sha256
+      shell: bash
     - if: runner.os == 'macOS'
-      run: shasum -a 256 -b ${{ inputs.archive }} > ${{ inputs.archive }}.sha256
+      run: shasum -a 256 -b ${{ inputs.binary }}.zip > ${{ inputs.binary }}.zip.sha256
+      shell: bash
 
     # upload
     - if: inputs.dry-run == false
-      run: gh release upload "${GITHUB_REF##*/}" ${{ inputs.archive }} ${{ inputs.archive }}.sha256
+      run: gh release upload "${GITHUB_REF##*/}" ${{ inputs.binary }}.zip ${{ inputs.binary }}.zip.sha256
+      shell: bash
