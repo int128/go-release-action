@@ -1,14 +1,10 @@
 name: release
-description: release assets
+description: release assets on tag
 
 inputs:
   binary:
     description: path to a binary
     required: true
-  dry-run:
-    description: set false to upload an archive
-    required: false
-    default: ${{ startsWith(github.ref, 'refs/tags/') }}
 
 runs:
   using: composite
@@ -28,8 +24,10 @@ runs:
     - if: runner.os == 'macOS'
       run: shasum -a 256 -b ${{ inputs.binary }}.zip > ${{ inputs.binary }}.zip.sha256
       shell: bash
+    - run: cat ${{ inputs.binary }}.zip.sha256
+      shell: bash
 
     # upload
-    - if: inputs.dry-run == false
+    - if: startsWith(github.ref, 'refs/tags/')
       run: gh release upload "${GITHUB_REF##*/}" ${{ inputs.binary }}.zip ${{ inputs.binary }}.zip.sha256
       shell: bash
