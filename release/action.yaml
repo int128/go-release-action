@@ -23,7 +23,7 @@ runs:
 
     # digest
     - if: runner.os != 'macOS'
-      run: sha256sum -b ${{ inputs.binary }}.zip ${{ inputs.binary }}.zip.sha256
+      run: sha256sum -b ${{ inputs.binary }}.zip > ${{ inputs.binary }}.zip.sha256
       shell: bash
     - if: runner.os == 'macOS'
       run: shasum -a 256 -b ${{ inputs.binary }}.zip > ${{ inputs.binary }}.zip.sha256
