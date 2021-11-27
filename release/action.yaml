@@ -31,3 +31,5 @@ runs:
     - if: startsWith(github.ref, 'refs/tags/')
       run: gh release upload "${GITHUB_REF##*/}" ${{ inputs.binary }}.zip ${{ inputs.binary }}.zip.sha256
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
