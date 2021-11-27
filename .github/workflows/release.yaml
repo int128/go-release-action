@@ -29,8 +29,8 @@ jobs:
             GOARCH: amd64
     runs-on: ${{ matrix.platform.runs-on }}
     env:
-      GOOS: ${{ inputs.GOOS }}
-      GOARCH: ${{ inputs.GOARCH }}
+      GOOS: ${{ matrix.platform.GOOS }}
+      GOARCH: ${{ matrix.platform.GOARCH }}
     steps:
       - uses: actions/checkout@v2
       - uses: ./setup
