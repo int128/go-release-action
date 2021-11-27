@@ -20,15 +20,20 @@ runs:
     # archive
     - if: runner.os != 'Windows'
       run: zip ${{ inputs.archive }} ${{ inputs.binary }} LICENSE README.md
+      shell: bash
     - if: runner.os == 'Windows'
       run: powershell Compress-Archive -Path ${{ inputs.binary }}.exe,LICENSE,README.md -DestinationPath ${{ inputs.archive }}
+      shell: bash
 
     # digest
     - if: runner.os != 'macOS'
       run: sha256sum -b ${{ inputs.archive }} ${{ inputs.archive }}.sha256
+      shell: bash
     - if: runner.os == 'macOS'
       run: shasum -a 256 -b ${{ inputs.archive }} > ${{ inputs.archive }}.sha256
+      shell: bash
 
     # upload
     - if: inputs.dry-run == false
       run: gh release upload "${GITHUB_REF##*/}" ${{ inputs.archive }} ${{ inputs.archive }}.sha256
+      shell: bash
