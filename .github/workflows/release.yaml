@@ -3,6 +3,7 @@ name: release
 on:
   pull_request:
     paths:
+      - .github/workflows/release.yaml
       - release/**
   push:
     branches:
@@ -10,6 +11,7 @@ on:
     tags:
       - test/release/*
     paths:
+      - .github/workflows/release.yaml
       - release/**
 
 jobs:
@@ -31,6 +33,7 @@ jobs:
     env:
       GOOS: ${{ matrix.platform.GOOS }}
       GOARCH: ${{ matrix.platform.GOARCH }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
       - uses: ./setup
