@@ -48,6 +48,26 @@ This action builds an archive and digest, and releases them into GitHub Releases
 For example,
 
 ```yaml
+name: release
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/release.yaml
+      - '**.go'
+      - go.*
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/release.yaml
+      - '**.go'
+      - go.*
+
 jobs:
   build:
     strategy:
@@ -57,7 +77,19 @@ jobs:
             GOOS: linux
             GOARCH: amd64
           - runs-on: ubuntu-latest
+            GOOS: linux
+            GOARCH: arm64
+          - runs-on: ubuntu-latest
+            GOOS: linux
+            GOARCH: arm
+          - runs-on: ubuntu-latest
             GOOS: darwin
+            GOARCH: amd64
+          - runs-on: ubuntu-latest
+            GOOS: darwin
+            GOARCH: arm64
+          - runs-on: ubuntu-latest
+            GOOS: windows
             GOARCH: amd64
     runs-on: ${{ matrix.platform.runs-on }}
     env:
