@@ -1,4 +1,13 @@
 {
+  "labels": [
+    "renovate/{{depName}}"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin"],
+      "automerge": true
+    }
+  ],
   "regexManagers": [
     {
       "fileMatch": [
@@ -11,5 +20,8 @@
       "depNameTemplate": "golangci/golangci-lint",
       "datasourceTemplate": "github-releases"
     }
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
   ]
 }

@@ -75,3 +75,18 @@ jobs:
         with:
           binary: example
 ```
+
+
+## Renovate config
+
+This provides a general-purpose config for Renovate.
+See [`default.json`](default.json) for details.
+
+```json
+{
+  "extends": [
+    "config:base",
+    "github>int128/go-actions",
+  ],
+}
+```
