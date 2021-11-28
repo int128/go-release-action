@@ -43,5 +43,5 @@ jobs:
       - uses: ./release
         with:
           binary: go-actions
-      - run: ls -l go-actions_$GOOS_$GOARCH.zip
-      - run: zipinfo go-actions_$GOOS_$GOARCH.zip
+      - run: ls -l go-actions_${GOOS}_${GOARCH}.zip
+      - run: zipinfo go-actions_${GOOS}_${GOARCH}.zip
