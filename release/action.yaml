@@ -24,6 +24,7 @@ runs:
 
     # archive
     - run: test -f "${{ steps.config.outputs.binary }}"
+      shell: bash
     - if: runner.os != 'Windows'
       run: zip ${{ steps.config.outputs.zip }} ${{ steps.config.outputs.binary }} LICENSE README.md
       shell: bash
