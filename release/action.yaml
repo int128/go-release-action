@@ -13,8 +13,8 @@ runs:
       run: |
         test "$GOOS"
         test "$GOARCH"
-        echo "::set-output name=zip::${{ inputs.binary }}-${GOOS}-${GOARCH}.zip"
-        echo "::set-output name=sha::${{ inputs.binary }}-${GOOS}-${GOARCH}.zip.sha256"
+        echo "::set-output name=zip::${{ inputs.binary }}_${GOOS}_${GOARCH}.zip"
+        echo "::set-output name=sha::${{ inputs.binary }}_${GOOS}_${GOARCH}.zip.sha256"
       shell: bash
 
     # archive
