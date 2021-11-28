@@ -3,7 +3,7 @@ description: release assets on tag
 
 inputs:
   binary:
-    description: path to a binary
+    description: path to a binary (automatically added .exe for windows)
     required: true
 
 runs:
@@ -15,14 +15,20 @@ runs:
         test "$GOARCH"
         echo "::set-output name=zip::${{ inputs.binary }}_${GOOS}_${GOARCH}.zip"
         echo "::set-output name=sha::${{ inputs.binary }}_${GOOS}_${GOARCH}.zip.sha256"
+        if [[ $GOOS == windows ]]; then
+          echo "::set-output name=binary::${{ inputs.binary }}.exe"
+        else
+          echo "::set-output name=binary::${{ inputs.binary }}"
+        fi
       shell: bash
 
     # archive
+    - run: test -f "${{ steps.config.outputs.binary }}"
     - if: runner.os != 'Windows'
-      run: zip ${{ steps.config.outputs.zip }} ${{ inputs.binary }} LICENSE README.md
+      run: zip ${{ steps.config.outputs.zip }} ${{ steps.config.outputs.binary }} LICENSE README.md
       shell: bash
     - if: runner.os == 'Windows'
-      run: powershell Compress-Archive -Path ${{ inputs.binary }}.exe,LICENSE,README.md -DestinationPath ${{ steps.config.outputs.zip }}
+      run: powershell Compress-Archive -Path ${{ steps.config.outputs.binary }},LICENSE,README.md -DestinationPath ${{ steps.config.outputs.zip }}
       shell: bash
 
     # digest
