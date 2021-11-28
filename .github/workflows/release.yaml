@@ -44,4 +44,6 @@ jobs:
         with:
           binary: go-actions
       - run: ls -l go-actions_${GOOS}_${GOARCH}.zip
+        shell: bash
       - run: zipinfo go-actions_${GOOS}_${GOARCH}.zip
+        shell: bash
