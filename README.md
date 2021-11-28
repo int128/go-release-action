@@ -5,12 +5,12 @@ This repository provides general-purpose actions for Go.
 
 ## setup [![setup](https://github.com/int128/go-actions/actions/workflows/setup.yaml/badge.svg)](https://github.com/int128/go-actions/actions/workflows/setup.yaml)
 
-This action runs `actions/setup-go` and `actions/cache`.
+This action runs `actions/setup-go` with `actions/cache`.
 
 For example,
 
 ```yaml
-jobs
+jobs:
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
