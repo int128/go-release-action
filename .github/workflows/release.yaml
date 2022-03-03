@@ -35,7 +35,7 @@ jobs:
       GOARCH: ${{ matrix.platform.GOARCH }}
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./setup
         with:
           go-version: 1.17
