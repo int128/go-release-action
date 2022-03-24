@@ -21,7 +21,7 @@ jobs:
           go-version: 1.17
       - uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.45.0
+          version: v1.45.1
 
   test:
     runs-on: ubuntu-latest
