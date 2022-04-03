@@ -30,6 +30,7 @@
       "matchStrings": [
         "uses: int128/go-actions/setup@.+?\\s+with:\\s+go-version: (?<currentValue>.+)\\n"
       ],
+      "depNameTemplate": "golang-version",
       "datasourceTemplate": "golang-version"
     }
   ],
