@@ -21,6 +21,18 @@
       "datasourceTemplate": "github-releases"
     }
   ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^README.md$",
+        "^\\.github/workflows/.+\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "uses: int128/go-actions/setup@.+?\\s+with:\\s+go-version: (?<currentValue>.+)\\n"
+      ],
+      "datasourceTemplate": "golang-version"
+    }
+  ],
   "postUpdateOptions": [
     "gomodTidy"
   ]
