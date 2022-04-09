@@ -19,6 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./setup
+        # for Renovate
+        #uses: int128/go-actions/setup@v1
         with:
           go-version: 1.17
       - uses: golangci/golangci-lint-action@v3
@@ -31,6 +33,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./setup
+        # for Renovate
+        #uses: int128/go-actions/setup@v1
         with:
           go-version: 1.17
       - run: go build
