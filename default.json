@@ -6,6 +6,17 @@
     {
       "matchUpdateTypes": ["minor", "patch", "pin"],
       "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "matchPackageNames": ["golang"],
+      "matchManagers": ["dockerfile"],
+      "automerge": false
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "matchDatasources": ["golang-version"],
+      "automerge": false
     }
   ],
   "regexManagers": [
@@ -30,7 +41,6 @@
       "matchStrings": [
         "uses: int128/go-actions/setup@.+?\\s+with:\\s+go-version: (?<currentValue>.+)\\n"
       ],
-      "allowedVersions": "/^[0-9]+\\.[0-9]+$/",
       "depNameTemplate": "golang-version",
       "datasourceTemplate": "golang-version",
       "versioningTemplate": "semver-coerced"
