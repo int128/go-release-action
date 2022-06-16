@@ -23,9 +23,7 @@
       ],
       "depNameTemplate": "golangci/golangci-lint",
       "datasourceTemplate": "github-releases"
-    }
-  ],
-  "regexManagers": [
+    },
     {
       "fileMatch": [
         "^README.md$",
