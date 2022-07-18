@@ -1,6 +1,10 @@
 {
   "packageRules": [
     {
+      "matchUpdateTypes": ["digest"],
+      "automerge": true
+    },
+    {
       "matchUpdateTypes": ["minor"],
       "matchPackageNames": ["golang"],
       "matchManagers": ["dockerfile"],
