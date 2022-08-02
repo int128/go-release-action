@@ -1,3 +1,3 @@
 module github.com/int128/go-actions
 
-go 1.16
+go 1.19
