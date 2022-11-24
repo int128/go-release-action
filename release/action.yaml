@@ -43,8 +43,8 @@ runs:
       shell: bash
 
     # upload
-    - if: startsWith(github.ref, 'refs/tags/')
-      run: gh release upload "${GITHUB_REF/refs\/tags\//}" ${{ steps.config.outputs.zip }} ${{ steps.config.outputs.sha }}
+    - if: github.ref_type == 'tag'
+      run: gh release upload '${{ github.ref_name }}' ${{ steps.config.outputs.zip }} ${{ steps.config.outputs.sha }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
