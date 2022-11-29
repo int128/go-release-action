@@ -2,35 +2,49 @@
 
 This repository provides general-purpose actions for Go.
 
-
-## setup [![setup](https://github.com/int128/go-actions/actions/workflows/setup.yaml/badge.svg)](https://github.com/int128/go-actions/actions/workflows/setup.yaml)
-
-This action runs `actions/setup-go` with `actions/cache`.
-
-For example,
+## Typical workflow
 
 ```yaml
+name: go
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: int128/go-actions/setup@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
-          go-version: 1.18.5
+          go-version: 1.19.3
+          cache: true
       - uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.48.0
+          version: v1.50.1
+          args: --timeout=3m
+
+  tidy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.3
+          cache: true
+      - run: go mod tidy
+      - uses: int128/update-generated-files-action@v2
 
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: int128/go-actions/setup@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
-          go-version: 1.18.5
+          go-version: 1.19.3
+          cache: true
       - run: go test -v -race ./...
 ```
 
@@ -95,10 +109,11 @@ jobs:
       CGO_ENABLED: 0
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: int128/go-actions/setup@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
-          go-version: 1.18.5
+          go-version: 1.19.3
+          cache: true
       - run: go build -ldflags "-X main.version=${GITHUB_REF##*/}"
       - uses: int128/go-actions/release@v1
         with:
