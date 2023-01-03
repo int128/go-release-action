@@ -13,12 +13,12 @@ runs:
       run: |
         test "$GOOS"
         test "$GOARCH"
-        echo "::set-output name=zip::${{ inputs.binary }}_${GOOS}_${GOARCH}.zip"
-        echo "::set-output name=sha::${{ inputs.binary }}_${GOOS}_${GOARCH}.zip.sha256"
+        echo "zip=${{ inputs.binary }}_${GOOS}_${GOARCH}.zip" >> $GITHUB_OUTPUT
+        echo "sha=${{ inputs.binary }}_${GOOS}_${GOARCH}.zip.sha256" >> $GITHUB_OUTPUT
         if [[ $GOOS == windows ]]; then
-          echo "::set-output name=binary::${{ inputs.binary }}.exe"
+          echo "binary=${{ inputs.binary }}.exe" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=binary::${{ inputs.binary }}"
+          echo "binary=${{ inputs.binary }}" >> $GITHUB_OUTPUT
         fi
       shell: bash
 
