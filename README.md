@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.19.4
+          go-version: 1.19.5
           cache: true
       - uses: golangci/golangci-lint-action@v3
         with:
@@ -31,7 +31,7 @@ jobs:
           ref: ${{ github.head_ref }}
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.19.4
+          go-version: 1.19.5
           cache: true
       - run: go mod tidy
       - uses: int128/update-generated-files-action@v2
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.19.4
+          go-version: 1.19.5
           cache: true
       - run: go test -v -race ./...
 ```
@@ -112,7 +112,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.19.4
+          go-version: 1.19.5
           cache: true
       - run: go build -ldflags '-X main.version=${{ github.ref_name }}'
       - uses: int128/go-actions/release@v1
