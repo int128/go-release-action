@@ -123,14 +123,4 @@ jobs:
 
 ## Renovate config
 
-This provides a general-purpose config for Renovate.
-See [`default.json`](default.json) for details.
-
-```json
-{
-  "extends": [
-    "config:base",
-    "github>int128/go-actions",
-  ],
-}
-```
+See https://github.com/int128/go-renovate-config.
