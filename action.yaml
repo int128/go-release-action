@@ -9,6 +9,11 @@ inputs:
     description: The working directory
     default: .
 
+outputs:
+  zip-name:
+    description: The name of the zip file
+    value: ${{ steps.config.outputs.zip_name }}
+
 runs:
   using: composite
   steps:

@@ -79,12 +79,17 @@ It will upload the following files to GitHub Releases:
 
 ## Specification
 
-This action creates the following archives:
+This action assumes the following files exist:
+
+- `${BINARY}` (Linux and macOS)
+- `${BINARY}.exe` (Windows)
+- `README.md`
+- `LICENSE`
+
+It generates the following archives:
 
 - `${BINARY}_${GOOS}_${GOARCH}.zip`
 - `${BINARY}_${GOOS}_${GOARCH}.zip.sha256`
-
-It assumes that `${BINARY}` (Linux and macOS) or `${BINARY}.exe` (Windows) exists in the working directory.
 
 ### Inputs
 
