@@ -1,4 +1,4 @@
-# go-release-action
+# go-release-action [![test](https://github.com/int128/go-release-action/actions/workflows/test.yaml/badge.svg)](https://github.com/int128/go-release-action/actions/workflows/test.yaml)
 
 This is a composite action to publish a Go binary into GitHub Releases.
 
@@ -12,7 +12,7 @@ name: release
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - .github/workflows/release.yaml
       - "**.go"
@@ -21,7 +21,7 @@ on:
       - v*
   pull_request:
     branches:
-      - master
+      - main
     paths:
       - .github/workflows/release.yaml
       - "**.go"
