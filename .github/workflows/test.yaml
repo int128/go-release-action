@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/test.yaml
-      - fixture_test/**
+      - fixture/**
   push:
     branches:
       - v2
@@ -12,7 +12,7 @@ on:
       - test/release/*
     paths:
       - .github/workflows/test.yaml
-      - fixture_test/**
+      - fixture/**
 
 jobs:
   test:
@@ -36,16 +36,16 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: fixture_test
+        working-directory: fixture
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: 1.21.5
-      - run: go build -o fixture
+      - run: go build
       - uses: ./ # int128/go-release-action@v2
         with:
-          working-directory: fixture_test
+          working-directory: fixture
           binary: fixture
       - run: ls -l "fixture_${GOOS}_${GOARCH}.zip"
       - run: zipinfo "fixture_${GOOS}_${GOARCH}.zip"
