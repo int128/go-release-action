@@ -1,62 +1,10 @@
-# go-actions
+# go-release-action
 
-This repository provides general-purpose actions for Go.
+This is a composite action to publish a Go binary into GitHub Releases.
 
-## Typical workflow
+## Getting Started
 
-```yaml
-name: go
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.19.5
-          cache: true
-      - uses: golangci/golangci-lint-action@v3
-        with:
-          version: v1.50.1
-          args: --timeout=3m
-
-  tidy:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.19.5
-          cache: true
-      - run: go mod tidy
-      - uses: int128/update-generated-files-action@v2
-
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.19.5
-          cache: true
-      - run: go test -v -race ./...
-```
-
-
-## release [![release](https://github.com/int128/go-actions/actions/workflows/release.yaml/badge.svg)](https://github.com/int128/go-actions/actions/workflows/release.yaml)
-
-This action builds an archive and digest, and releases them into GitHub Releases on tag event.
-
-- `NAME_GOOS_GOARCH.zip`
-- `NAME_GOOS_GOARCH.zip.sha256`
-
-For example,
+Here is an example workflow.
 
 ```yaml
 name: release
@@ -67,7 +15,7 @@ on:
       - master
     paths:
       - .github/workflows/release.yaml
-      - '**.go'
+      - "**.go"
       - go.*
     tags:
       - v*
@@ -76,7 +24,7 @@ on:
       - master
     paths:
       - .github/workflows/release.yaml
-      - '**.go'
+      - "**.go"
       - go.*
 
 jobs:
@@ -90,9 +38,6 @@ jobs:
           - runs-on: ubuntu-latest
             GOOS: linux
             GOARCH: arm64
-          - runs-on: ubuntu-latest
-            GOOS: linux
-            GOARCH: arm
           - runs-on: ubuntu-latest
             GOOS: darwin
             GOARCH: amd64
@@ -109,18 +54,41 @@ jobs:
       CGO_ENABLED: 0
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.19.5
-          cache: true
-      - run: go build -ldflags '-X main.version=${{ github.ref_name }}'
-      - uses: int128/go-actions/release@v1
+          go-version: 1.21.5
+      - run: go build
+      - uses: int128/go-release-action@v2
         with:
           binary: example
 ```
 
+It will upload the following files to GitHub Releases:
 
-## Renovate config
+- `example_linux_amd64.zip`
+- `example_linux_amd64.zip.sha256`
+- `example_linux_arm64.zip`
+- `example_linux_arm64.zip.sha256`
+- `example_darwin_amd64.zip`
+- `example_darwin_amd64.zip.sha256`
+- `example_darwin_arm64.zip`
+- `example_darwin_arm64.zip.sha256`
+- `example_windows_amd64.zip`
+- `example_windows_amd64.zip.sha256`
 
-See https://github.com/int128/go-renovate-config.
+## Specification
+
+This action creates the following archives:
+
+- `${BINARY}_${GOOS}_${GOARCH}.zip`
+- `${BINARY}_${GOOS}_${GOARCH}.zip.sha256`
+
+It assumes that `${BINARY}` (Linux and macOS) or `${BINARY}.exe` (Windows) exists in the working directory.
+
+### Inputs
+
+| Name                | Description                                                   | Default    |
+| ------------------- | ------------------------------------------------------------- | ---------- |
+| `binary`            | Filename of the binary (automatically add `.exe` for Windows) | (required) |
+| `working-directory` | The working directory                                         | `.`        |
