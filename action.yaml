@@ -56,7 +56,7 @@ runs:
         zip_name: ${{ steps.config.outputs.zip_name }}
         sha_name: ${{ steps.config.outputs.sha_name }}
     - if: runner.os == 'macOS'
-      run: shasum -a 256 -b "$zip" > "$sha_name"
+      run: shasum -a 256 -b "$zip_name" > "$sha_name"
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       env:
