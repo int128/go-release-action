@@ -3,16 +3,16 @@ name: release
 on:
   pull_request:
     paths:
-      - .github/workflows/release.yaml
-      - release/**
+      - .github/workflows/test.yaml
+      - fixture/**
   push:
     branches:
-      - v1
+      - v2
     tags:
       - test/release/*
     paths:
-      - .github/workflows/release.yaml
-      - release/**
+      - .github/workflows/test.yaml
+      - fixture/**
 
 jobs:
   test:
@@ -34,16 +34,19 @@ jobs:
       GOOS: ${{ matrix.platform.GOOS }}
       GOARCH: ${{ matrix.platform.GOARCH }}
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: fixture
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: 1.21.5
       - run: go build
-      - uses: ./release
+      - id: go-release-action
+        uses: ./ # int128/go-release-action@v2
         with:
-          binary: go-actions
-      - run: ls -l go-actions_${GOOS}_${GOARCH}.zip
-        shell: bash
-      - run: zipinfo go-actions_${GOOS}_${GOARCH}.zip
-        shell: bash
+          working-directory: fixture
+          binary: fixture
+      - run: ls -l '${{ steps.go-release-action.outputs.zip-name }}'
+      - run: zipinfo '${{ steps.go-release-action.outputs.zip-name }}'

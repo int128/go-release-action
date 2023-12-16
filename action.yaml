@@ -1,0 +1,85 @@
+name: go-release-action
+description: Release the binary on a tag
+
+inputs:
+  binary:
+    description: Filename of the binary (automatically add .exe for Windows)
+    required: true
+  working-directory:
+    description: The working directory
+    default: .
+
+outputs:
+  zip-name:
+    description: The name of the zip file
+    value: ${{ steps.config.outputs.zip_name }}
+
+runs:
+  using: composite
+  steps:
+    - id: config
+      run: |
+        test "$GOOS"
+        test "$GOARCH"
+        echo "zip_name=${{ inputs.binary }}_${GOOS}_${GOARCH}.zip" >> "$GITHUB_OUTPUT"
+        echo "sha_name=${{ inputs.binary }}_${GOOS}_${GOARCH}.zip.sha256" >> "$GITHUB_OUTPUT"
+        if [[ $GOOS == windows ]]; then
+          echo "binary_name=${{ inputs.binary }}.exe" >> "$GITHUB_OUTPUT"
+        else
+          echo "binary_name=${{ inputs.binary }}" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+
+    - run: test -f "$binary_name"
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        binary_name: ${{ steps.config.outputs.binary_name }}
+
+    # Archive
+    - if: runner.os != 'Windows'
+      run: zip "$zip_name" "$binary_name" LICENSE README.md
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        binary_name: ${{ steps.config.outputs.binary_name }}
+        zip_name: ${{ steps.config.outputs.zip_name }}
+    - if: runner.os == 'Windows'
+      run: powershell Compress-Archive -Path "${binary_name},LICENSE,README.md" -DestinationPath "$zip_name"
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        binary_name: ${{ steps.config.outputs.binary_name }}
+        zip_name: ${{ steps.config.outputs.zip_name }}
+
+    # Digest
+    - if: runner.os != 'macOS'
+      run: sha256sum -b "$zip_name" > "$sha_name"
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        zip_name: ${{ steps.config.outputs.zip_name }}
+        sha_name: ${{ steps.config.outputs.sha_name }}
+    - if: runner.os == 'macOS'
+      run: shasum -a 256 -b "$zip_name" > "$sha_name"
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        zip_name: ${{ steps.config.outputs.zip_name }}
+        sha_name: ${{ steps.config.outputs.sha_name }}
+
+    - run: cat "$sha_name"
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        sha_name: ${{ steps.config.outputs.sha_name }}
+
+    # Upload
+    - if: github.ref_type == 'tag'
+      run: gh release upload '${{ github.ref_name }}' "$zip_name" "$sha_name"
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        zip_name: ${{ steps.config.outputs.zip_name }}
+        sha_name: ${{ steps.config.outputs.sha_name }}
