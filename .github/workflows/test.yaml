@@ -48,4 +48,6 @@ jobs:
           working-directory: fixture
           binary: fixture
       - run: ls -l '${{ steps.go-release-action.outputs.zip-name }}'
+        working-directory: fixture
       - run: zipinfo '${{ steps.go-release-action.outputs.zip-name }}'
+        working-directory: fixture
