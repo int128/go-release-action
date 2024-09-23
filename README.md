@@ -55,9 +55,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.21.5
+          go-version-file: go.mod
       - run: go build
       - uses: int128/go-release-action@v2
         with:
