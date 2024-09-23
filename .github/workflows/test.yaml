@@ -34,19 +34,20 @@ jobs:
       GOOS: ${{ matrix.platform.GOOS }}
       GOARCH: ${{ matrix.platform.GOARCH }}
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: fixture
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: 1.23.1
+          go-version-file: fixture/go.mod
       - run: go build
-      - id: go-release-action
-        uses: ./ # int128/go-release-action@v2
+        working-directory: fixture
+      - name: Run int128/go-release-action
+        id: go-release-action
+        uses: ./
         with:
           working-directory: fixture
           binary: fixture
       - run: ls -l '${{ steps.go-release-action.outputs.zip-name }}'
+        working-directory: fixture
       - run: zipinfo '${{ steps.go-release-action.outputs.zip-name }}'
+        working-directory: fixture
