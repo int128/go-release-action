@@ -1,3 +1,3 @@
 module github.com/int128/go-release-action/fixture
 
-go 1.24.4
+go 1.24.5
