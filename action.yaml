@@ -1,5 +1,5 @@
 name: go-release-action
-description: Release the binary on a tag
+description: Upload a zip archive and sha256 digest of a Go binary built for the current platform.
 
 inputs:
   binary:
@@ -75,11 +75,11 @@ runs:
         sha_name: ${{ steps.config.outputs.sha_name }}
 
     # Upload
-    - if: github.ref_type == 'tag'
-      run: gh release upload '${{ github.ref_name }}' "$zip_name" "$sha_name"
-      working-directory: ${{ inputs.working-directory }}
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-        zip_name: ${{ steps.config.outputs.zip_name }}
-        sha_name: ${{ steps.config.outputs.sha_name }}
+    - uses: actions/upload-artifact@v6
+      with:
+        name: ${{ steps.config.outputs.zip_name }}
+        path: ${{ inputs.working-directory }}/${{ steps.config.outputs.zip_name }}
+    - uses: actions/upload-artifact@v6
+      with:
+        name: ${{ steps.config.outputs.sha_name }}
+        path: ${{ inputs.working-directory }}/${{ steps.config.outputs.sha_name }}
