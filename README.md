@@ -7,26 +7,6 @@ This is a composite action to publish a Go binary into GitHub Releases.
 Here is an example workflow.
 
 ```yaml
-name: release
-
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/release.yaml
-      - "**.go"
-      - go.*
-    tags:
-      - v*
-  pull_request:
-    branches:
-      - main
-    paths:
-      - .github/workflows/release.yaml
-      - "**.go"
-      - go.*
-
 jobs:
   build:
     strategy:
@@ -35,24 +15,19 @@ jobs:
           - runs-on: ubuntu-latest
             GOOS: linux
             GOARCH: amd64
-          - runs-on: ubuntu-latest
-            GOOS: linux
-            GOARCH: arm64
-          - runs-on: ubuntu-latest
+          - runs-on: macos-latest
             GOOS: darwin
             GOARCH: amd64
-          - runs-on: ubuntu-latest
-            GOOS: darwin
-            GOARCH: arm64
-          - runs-on: ubuntu-latest
+          - runs-on: windows-latest
             GOOS: windows
             GOARCH: amd64
     runs-on: ${{ matrix.platform.runs-on }}
     env:
       GOOS: ${{ matrix.platform.GOOS }}
       GOARCH: ${{ matrix.platform.GOARCH }}
-      CGO_ENABLED: 0
     timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -68,12 +43,8 @@ It will upload the following files to GitHub Releases:
 
 - `example_linux_amd64.zip`
 - `example_linux_amd64.zip.sha256`
-- `example_linux_arm64.zip`
-- `example_linux_arm64.zip.sha256`
 - `example_darwin_amd64.zip`
 - `example_darwin_amd64.zip.sha256`
-- `example_darwin_arm64.zip`
-- `example_darwin_arm64.zip.sha256`
 - `example_windows_amd64.zip`
 - `example_windows_amd64.zip.sha256`
 
@@ -93,7 +64,8 @@ It generates the following archives:
 
 ### Inputs
 
-| Name                | Description                                                   | Default    |
-| ------------------- | ------------------------------------------------------------- | ---------- |
-| `binary`            | Filename of the binary (automatically add `.exe` for Windows) | (required) |
-| `working-directory` | The working directory                                         | `.`        |
+| Name                | Description                                                   | Default                     |
+| ------------------- | ------------------------------------------------------------- | --------------------------- |
+| `binary`            | Filename of the binary (automatically add `.exe` for Windows) | (required)                  |
+| `release-name`      | If set, upload the assets to the release                      | Tag name for push tag event |
+| `working-directory` | The working directory                                         | `.`                         |
