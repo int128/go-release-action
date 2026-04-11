@@ -22,7 +22,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - run: gh release create --draft --title "$GITHUB_REF_NAME" "$GITHUB_REF_NAME"
+      - if: github.ref_type == 'tag'
+        run: gh release create --draft --title "$GITHUB_REF_NAME" "$GITHUB_REF_NAME"
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
