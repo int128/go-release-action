@@ -61,5 +61,6 @@ jobs:
           binary: fixture
       - run: zipinfo "$zip_name"
         working-directory: fixture
+        shell: bash
         env:
           zip_name: ${{ steps.go-release-action.outputs.zip-name }}
