@@ -21,20 +21,19 @@ runs:
       run: |
         test "$GOOS"
         test "$GOARCH"
-        echo "zip_name=${{ inputs.binary }}_${GOOS}_${GOARCH}.zip" >> "$GITHUB_OUTPUT"
-        echo "sha_name=${{ inputs.binary }}_${GOOS}_${GOARCH}.zip.sha256" >> "$GITHUB_OUTPUT"
+        echo "zip_name=${INPUT_BINARY}_${GOOS}_${GOARCH}.zip" >> "$GITHUB_OUTPUT"
+        echo "sha_name=${INPUT_BINARY}_${GOOS}_${GOARCH}.zip.sha256" >> "$GITHUB_OUTPUT"
         if [[ $GOOS == windows ]]; then
-          echo "binary_name=${{ inputs.binary }}.exe" >> "$GITHUB_OUTPUT"
+          test -f "${INPUT_BINARY}.exe"
+          echo "binary_name=${INPUT_BINARY}.exe" >> "$GITHUB_OUTPUT"
         else
-          echo "binary_name=${{ inputs.binary }}" >> "$GITHUB_OUTPUT"
+          test -f "${INPUT_BINARY}"
+          echo "binary_name=${INPUT_BINARY}" >> "$GITHUB_OUTPUT"
         fi
       shell: bash
-
-    - run: test -f "$binary_name"
       working-directory: ${{ inputs.working-directory }}
-      shell: bash
       env:
-        binary_name: ${{ steps.config.outputs.binary_name }}
+        INPUT_BINARY: ${{ inputs.binary }}
 
     # Archive
     - if: runner.os != 'Windows'
@@ -54,29 +53,27 @@ runs:
 
     # Digest
     - if: runner.os != 'macOS'
-      run: sha256sum -b "$zip_name" > "$sha_name"
+      run: |
+        sha256sum -b "$zip_name" > "$sha_name"
+        cat "$sha_name"
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       env:
         zip_name: ${{ steps.config.outputs.zip_name }}
         sha_name: ${{ steps.config.outputs.sha_name }}
     - if: runner.os == 'macOS'
-      run: shasum -a 256 -b "$zip_name" > "$sha_name"
+      run: |
+        shasum -a 256 -b "$zip_name" > "$sha_name"
+        cat "$sha_name"
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       env:
         zip_name: ${{ steps.config.outputs.zip_name }}
         sha_name: ${{ steps.config.outputs.sha_name }}
 
-    - run: cat "$sha_name"
-      working-directory: ${{ inputs.working-directory }}
-      shell: bash
-      env:
-        sha_name: ${{ steps.config.outputs.sha_name }}
-
     # Upload
     - if: github.ref_type == 'tag'
-      run: gh release upload '${{ github.ref_name }}' "$zip_name" "$sha_name"
+      run: gh release upload "$GITHUB_REF_NAME" "$zip_name" "$sha_name"
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       env:
