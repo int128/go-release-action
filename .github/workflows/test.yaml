@@ -59,7 +59,6 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
-          upload: true
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash
