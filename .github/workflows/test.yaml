@@ -17,7 +17,17 @@ on:
       - action.yaml
 
 jobs:
-  release:
+  draft:
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - run: gh release create --draft "$GITHUB_REF_NAME"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  upload:
+    needs: draft
     strategy:
       fail-fast: false
       matrix:
@@ -49,7 +59,7 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
-      - run: ls -l '${{ steps.go-release-action.outputs.zip-name }}'
+      - run: zipinfo "$zip_name"
         working-directory: fixture
-      - run: zipinfo '${{ steps.go-release-action.outputs.zip-name }}'
-        working-directory: fixture
+        env:
+          zip_name: ${{ steps.go-release-action.outputs.zip_name }}
