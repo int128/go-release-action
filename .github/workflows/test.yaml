@@ -15,16 +15,25 @@ on:
       - .github/workflows/test.yaml
       - fixture/**
       - action.yaml
+  workflow_dispatch:
+    inputs:
+      release-name:
+        description: Name to create a draft release (e.g. test/release/0)
+        type: string
+        required: true
 
 jobs:
   draft:
     runs-on: ubuntu-slim
     timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - if: github.ref_type == 'tag'
-        run: gh release create --draft --title "$GITHUB_REF_NAME" "$GITHUB_REF_NAME"
+      - if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
+        run: gh release create --draft --target "$GITHUB_SHA" --title "$release_name" "$release_name"
         env:
+          release_name: ${{ inputs.release-name || github.ref_name }}
           GITHUB_TOKEN: ${{ github.token }}
 
   upload:
@@ -60,6 +69,7 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
+          release-name: ${{ inputs.release-name || github.ref_name }}
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash

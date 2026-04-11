@@ -5,10 +5,9 @@ inputs:
   binary:
     description: Filename of the binary (automatically add .exe for Windows)
     required: true
-  upload:
-    description: Whether to upload the release assets
-    required: true
-    default: ${{ github.ref_type == 'tag' }}
+  release-name:
+    description: If set, upload the assets to the release
+    required: false
   working-directory:
     description: The working directory
     default: .
@@ -81,12 +80,13 @@ runs:
         sha_name: ${{ steps.config.outputs.sha_name }}
 
     # Upload
-    - if: inputs.upload == 'true'
+    - if: inputs.release-name
       name: Upload the release assets
-      run: gh release upload "$GITHUB_REF_NAME" "$zip_name" "$sha_name"
+      run: gh release upload "$release_name" "$zip_name" "$sha_name"
       working-directory: ${{ inputs.working-directory }}
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        release_name: ${{ inputs.release-name }}
         zip_name: ${{ steps.config.outputs.zip_name }}
         sha_name: ${{ steps.config.outputs.sha_name }}
