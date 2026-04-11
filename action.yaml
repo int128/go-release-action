@@ -81,7 +81,7 @@ runs:
         sha_name: ${{ steps.config.outputs.sha_name }}
 
     # Upload
-    - if: inputs.upload
+    - if: inputs.upload == 'true'
       name: Upload the release assets
       run: gh release upload "$GITHUB_REF_NAME" "$zip_name" "$sha_name"
       working-directory: ${{ inputs.working-directory }}
