@@ -18,6 +18,7 @@ runs:
   using: composite
   steps:
     - id: config
+      name: Configuration
       run: |
         test "$GOOS"
         test "$GOARCH"
@@ -37,6 +38,7 @@ runs:
 
     # Archive
     - if: runner.os != 'Windows'
+      name: Create ${{ steps.config.outputs.zip_name }}
       run: zip "$zip_name" "$binary_name" LICENSE README.md
       working-directory: ${{ inputs.working-directory }}
       shell: bash
@@ -44,6 +46,7 @@ runs:
         binary_name: ${{ steps.config.outputs.binary_name }}
         zip_name: ${{ steps.config.outputs.zip_name }}
     - if: runner.os == 'Windows'
+      name: Create ${{ steps.config.outputs.zip_name }}
       run: powershell Compress-Archive -Path "${binary_name},LICENSE,README.md" -DestinationPath "$zip_name"
       working-directory: ${{ inputs.working-directory }}
       shell: bash
@@ -53,6 +56,7 @@ runs:
 
     # Digest
     - if: runner.os != 'macOS'
+      name: Create ${{ steps.config.outputs.sha_name }}
       run: |
         sha256sum -b "$zip_name" > "$sha_name"
         cat "$sha_name"
@@ -62,6 +66,7 @@ runs:
         zip_name: ${{ steps.config.outputs.zip_name }}
         sha_name: ${{ steps.config.outputs.sha_name }}
     - if: runner.os == 'macOS'
+      name: Create ${{ steps.config.outputs.sha_name }}
       run: |
         shasum -a 256 -b "$zip_name" > "$sha_name"
         cat "$sha_name"
@@ -73,6 +78,7 @@ runs:
 
     # Upload
     - if: github.ref_type == 'tag'
+      name: Upload the release asset
       run: gh release upload "$GITHUB_REF_NAME" "$zip_name" "$sha_name"
       working-directory: ${{ inputs.working-directory }}
       shell: bash
