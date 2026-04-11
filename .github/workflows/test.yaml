@@ -29,20 +29,15 @@ jobs:
     permissions:
       contents: write
     outputs:
-      release-name: ${{ steps.create-release.outputs.release-name }}
+      created-release-name: ${{ steps.create.outputs.created-release-name }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-        id: create-release
-        run: |
-          if gh release view "$release_name"; then
-            exit
-          fi
-          gh release create --draft --target "$GITHUB_SHA" --title "$release_name" "$release_name"
-          echo "release-name=$release_name" >> "$GITHUB_OUTPUT"
-        env:
-          release_name: ${{ inputs.release-name || github.ref_name }}
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Run int128/go-release-action/create-draft-release
+        id: create
+        uses: ./create-draft-release
+        with:
+          # Create a draft release on workflow_dispatch or push tag
+          release-name: ${{ inputs.release-name || case(github.ref_type == 'tag', github.ref_name, '') }}
 
   upload:
     needs: draft
@@ -74,14 +69,14 @@ jobs:
       - run: go build
         working-directory: fixture
       - name: Run int128/go-release-action
-        id: go-release-action
+        id: upload
         uses: ./
         with:
           working-directory: fixture
           binary: fixture
-          release-name: ${{ needs.draft.outputs.release-name }}
+          release-name: ${{ needs.draft.outputs.created-release-name }}
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash
         env:
-          zip_name: ${{ steps.go-release-action.outputs.zip-name }}
+          zip_name: ${{ steps.upload.outputs.zip-name }}
