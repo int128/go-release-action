@@ -1,4 +1,4 @@
-name: go-release-action/create
+name: go-release-action/create-release
 description: Create a draft release
 inputs:
   release-name:
