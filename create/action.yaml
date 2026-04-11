@@ -1,0 +1,30 @@
+name: go-release-action/create
+description: Create a draft release
+inputs:
+  release-name:
+    description: Release name to create
+    required: true
+  token:
+    description: GitHub token to create a release
+    required: false
+    default: ${{ github.token }}
+outputs:
+  created-release-name:
+    description: The name of the created release
+    value: ${{ steps.create-release.outputs.created-release-name }}
+runs:
+  using: composite
+  steps:
+    - if: inputs.release-name != ''
+      id: create-release
+      name: Create a draft release if not exists
+      shell: bash
+      run: |
+        if gh release view --repo "$GITHUB_REPOSITORY" "$release_name"; then
+          exit
+        fi
+        gh release create --draft --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$release_name" "$release_name"
+        echo "created-release-name=$release_name" >> "$GITHUB_OUTPUT"
+      env:
+        release_name: ${{ inputs.release-name }}
+        GITHUB_TOKEN: ${{ inputs.token }}
