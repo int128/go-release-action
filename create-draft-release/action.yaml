@@ -1,4 +1,4 @@
-name: go-release-action/create-release
+name: go-release-action/create-draft-release
 description: Create a draft release
 inputs:
   release-name:
@@ -11,11 +11,11 @@ inputs:
 outputs:
   created-release-name:
     description: The name of the created release
-    value: ${{ steps.create-release.outputs.created-release-name }}
+    value: ${{ steps.create.outputs.created-release-name }}
 runs:
   using: composite
   steps:
-    - id: create-release
+    - id: create
       name: Create a draft release if not exists
       shell: bash
       run: |
