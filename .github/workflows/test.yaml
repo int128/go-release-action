@@ -13,6 +13,8 @@ on:
       - .github/workflows/test.yaml
       - fixture/**
       - action.yaml
+    tags:
+      - test/release/*
 
 concurrency:
   cancel-in-progress: true
@@ -22,14 +24,16 @@ jobs:
   create:
     runs-on: ubuntu-slim
     timeout-minutes: 10
+    outputs:
+      draft-release-name: ${{ steps.create-draft-release.outputs.draft-release-name }}
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Run int128/go-release-action/create-draft-release
+      - if: github.event_name == 'push'
+        name: Run int128/go-release-action/create-draft-release
+        id: create-draft-release
         uses: ./create-draft-release
-        with:
-          release-name: ${{ case(github.event_name == 'push', 'next', '') }}
 
   upload:
     needs: create
@@ -66,7 +70,7 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
-          release-name: ${{ case(github.event_name == 'push', 'next', '') }}
+          release-name: ${{ needs.create.outputs.draft-release-name }}
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash

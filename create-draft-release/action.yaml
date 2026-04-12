@@ -1,29 +1,39 @@
 name: go-release-action/create-draft-release
-description: Create a draft release
+description: |
+  Create a draft release.
+  If the draft release already exists, recreate a new one.
+  If the published release already exists, skip creating a release.
 inputs:
-  release-name:
-    description: Release name to create
-    required: true
   token:
-    description: GitHub token to create a release
+    description: GitHub token
     required: false
     default: ${{ github.token }}
+outputs:
+  draft-release-name:
+    description: The name of the created draft release
+    value: ${{ steps.create.outputs.draft-release-name }}
 runs:
   using: composite
   steps:
     - id: create
-      name: Create a draft release if not exists
+      name: Create a draft release
       shell: bash
       run: |
-        if [[ -z "$release_name" ]]; then
-          echo "No release-name is specified. Skip creating a release." >&2
-          exit 0
+        release_name=next
+        if [[ $GITHUB_REF_TYPE == tag ]]; then
+          release_name="$GITHUB_REF_NAME"
         fi
-        if gh release view --repo "$GITHUB_REPOSITORY" "$release_name"; then
-          echo "Release $release_name already exists. Recreating the release." >&2
+        is_draft="$(gh release view --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft "$release_name" || true)"
+        if [[ "$is_draft" == "false" ]]; then
+          echo "Already exists a published release $release_name. Skip creating a release." >&2
+          exit 0
+        elif [[ "$is_draft" == "true" ]]; then
+          echo "Deleting the existing draft release $release_name" >&2
           gh release delete --repo "$GITHUB_REPOSITORY" --yes "$release_name"
         fi
+        echo "Creating a draft release $release_name" >&2
         gh release create --draft --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$release_name" "$release_name"
+        echo "draft-release-name=$release_name" >> "$GITHUB_OUTPUT"
       env:
         release_name: ${{ inputs.release-name }}
         GITHUB_TOKEN: ${{ inputs.token }}
