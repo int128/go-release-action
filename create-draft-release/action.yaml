@@ -1,8 +1,11 @@
 name: go-release-action/create-draft-release
-description: Create a draft release
+description: |
+  Create a draft release.
+  If the draft release already exists, recreate a new one.
+  If the published release already exists, skip creating a release.
 inputs:
   token:
-    description: GitHub token to create a release
+    description: GitHub token
     required: false
     default: ${{ github.token }}
 outputs:
