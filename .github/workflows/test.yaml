@@ -25,7 +25,7 @@ jobs:
       - name: Run int128/go-release-action/create-draft-release
         uses: ./create-draft-release
         with:
-          release-name: next # ${{ case(github.event_name == 'push', 'next', '') }}
+          release-name: next ## ${{ case(github.event_name == 'push', 'next', '') }}
 
   upload:
     needs: create
@@ -62,7 +62,7 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
-          release-name: next # ${{ case(github.event_name == 'push', 'next', '') }}
+          release-name: next ## ${{ case(github.event_name == 'push', 'next', '') }}
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash
