@@ -23,24 +23,24 @@ on:
         required: true
 
 jobs:
-  draft:
+  create:
     runs-on: ubuntu-slim
     timeout-minutes: 10
     permissions:
       contents: write
     outputs:
-      created-release-name: ${{ steps.create.outputs.created-release-name }}
+      already-exists: ${{ steps.create.outputs.already-exists }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Run int128/go-release-action/create-draft-release
         id: create
         uses: ./create-draft-release
         with:
-          # Create a draft release on workflow_dispatch or push tag
           release-name: ${{ inputs.release-name || case(github.ref_type == 'tag', github.ref_name, '') }}
 
   upload:
-    needs: draft
+    if: needs.create.outputs.already-exists != 'true'
+    needs: create
     strategy:
       fail-fast: false
       matrix:
@@ -74,7 +74,7 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
-          release-name: ${{ needs.draft.outputs.created-release-name }}
+          release-name: ${{ inputs.release-name || case(github.ref_type == 'tag', github.ref_name, '') }}
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash
