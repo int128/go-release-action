@@ -20,7 +20,7 @@ runs:
         if [[ $GITHUB_REF_TYPE == tag ]]; then
           release_name="$GITHUB_REF_NAME"
         fi
-        is_draft="$(gh release view --repo "$GITHUB_REPOSITORY" --json draft --jq .draft || true)"
+        is_draft="$(gh release view --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft || true)"
         if [[ "$is_draft" == "false" ]]; then
           echo "Already exists a published release $release_name. Skip creating a release." >&2
           exit 0
