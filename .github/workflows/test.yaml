@@ -9,18 +9,10 @@ on:
   push:
     branches:
       - v2
-    tags:
-      - test/release/*
     paths:
       - .github/workflows/test.yaml
       - fixture/**
       - action.yaml
-  workflow_dispatch:
-    inputs:
-      release-name:
-        description: Name to create a draft release (e.g. test/release/0)
-        type: string
-        required: true
 
 jobs:
   create:
@@ -28,18 +20,14 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
-    outputs:
-      already-exists: ${{ steps.create.outputs.already-exists }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Run int128/go-release-action/create-draft-release
-        id: create
         uses: ./create-draft-release
         with:
-          release-name: ${{ inputs.release-name || case(github.ref_type == 'tag', github.ref_name, '') }}
+          release-name: ${{ case(github.event_name == 'push', 'next', '') }}
 
   upload:
-    if: needs.create.outputs.already-exists != 'true'
     needs: create
     strategy:
       fail-fast: false
@@ -74,7 +62,7 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
-          release-name: ${{ inputs.release-name || case(github.ref_type == 'tag', github.ref_name, '') }}
+          release-name: ${{ case(github.event_name == 'push', 'next', '') }}
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash

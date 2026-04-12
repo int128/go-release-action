@@ -8,10 +8,6 @@ inputs:
     description: GitHub token to create a release
     required: false
     default: ${{ github.token }}
-outputs:
-  already-exists:
-    description: Returns true if the release already exists
-    value: ${{ steps.create.outputs.already-exists }}
 runs:
   using: composite
   steps:
@@ -24,9 +20,8 @@ runs:
           exit 0
         fi
         if gh release view --repo "$GITHUB_REPOSITORY" "$release_name"; then
-          echo "Release $release_name already exists. Skip creating a release." >&2
-          echo "already-exists=true" >> "$GITHUB_OUTPUT"
-          exit 0
+          echo "Release $release_name already exists. Recreating the release." >&2
+          gh release delete --repo "$GITHUB_REPOSITORY" --yes "$release_name"
         fi
         gh release create --draft --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$release_name" "$release_name"
       env:
