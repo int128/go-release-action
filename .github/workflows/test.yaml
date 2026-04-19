@@ -71,6 +71,8 @@ jobs:
           working-directory: fixture
           binary: fixture
           release-name: ${{ needs.create.outputs.draft-release-name }}
+
+      # Verify the zip file.
       - run: zipinfo "$zip_name"
         working-directory: fixture
         shell: bash
