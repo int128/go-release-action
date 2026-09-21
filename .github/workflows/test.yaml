@@ -25,15 +25,15 @@ jobs:
     runs-on: ubuntu-slim
     timeout-minutes: 10
     outputs:
-      draft-release-name: ${{ steps.create-draft-release.outputs.draft-release-name }}
+      release-name: ${{ steps.create-draft-release.outputs.release-name }}
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - if: github.event_name == 'push'
-        name: Run int128/go-release-action/create-draft-release
-        id: create-draft-release
-        uses: ./create-draft-release
+      - id: create-draft-release
+        uses: int128/create-draft-release-action@f232d92906ec5d836edf04857b0ba445b08bac2c # v0.7.0
+        with:
+          dry-run: ${{ github.event_name == 'pull_request' }}
 
   upload:
     needs: create
@@ -70,7 +70,7 @@ jobs:
         with:
           working-directory: fixture
           binary: fixture
-          release-name: ${{ needs.create.outputs.draft-release-name }}
+          release-name: ${{ needs.create.outputs.release-name }}
 
       # Verify the zip file.
       - run: zipinfo "$zip_name"
